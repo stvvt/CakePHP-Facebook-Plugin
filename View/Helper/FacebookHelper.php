@@ -127,26 +127,38 @@ class FacebookHelper extends AppHelper {
 			),
 			$options
 		);
-		if((isset($options['redirect']) && $options['redirect']) || $options['custom']){
-			$options['redirect'] = Router::url($options['redirect']);
-			$onclick = "login('".$options['redirect']."');";
-			if($options['img']){
-				$source = '/Facebook/img/'.$options['img'];
-				return $this->Html->image($source, array(
-				'alt' => $options['alt'],
-				'id' => $options['id'],
-				'url' => '#',
-				'onclick' => $onclick));
+		
+		$fbSpecificOptions = Utils::array_remove_keys($options, 
+		    array(
+		        'show-faces', 'width', 'max-rows',
+	        )
+		);
+		
+		extract(
+		    Utils::array_remove_keys($options, 
+    		    array(
+    		        'label', 'custom', 'redirect', 'img', 'alt', 'id',
+    	        )
+    		)
+	    );
+		
+		if ($redirect || $custom) {
+			$redirect = Router::url($redirect);
+			$onclick = "login('{$redirect}');";
+			if ($img) {
+				$source = "/Facebook/img/{$img}";
+				$url    = $redirect;
+				
+				return $this->Html->image($source, compact('alt', 'id', 'url', 'onclick')); 
 			}
 			else {
-				return $this->Html->link($options['label'], '#', array(
-					'onclick' => $onclick, 'id' => $options['id']));
+				return $this->Html->link($label, $redirect, $options + compact('onclick', 'id'));
 			}
 		}
 		else {
-			if(!$options['id']){ unset($options['id']); }
-			unset($options['label'], $options['custom'], $options['redirect'], $options['img'], $options['alt']);
-			return $this->__fbTag('fb:login-button', $label, $options);
+			if ($id) { $fbSpecificOptions['id'] = $id; }
+
+			return $this->__fbTag('fb:login-button', $label, $fbSpecificOptions);
 		}
 	}
 	
@@ -176,35 +188,39 @@ class FacebookHelper extends AppHelper {
 				'redirect' => false,
 				'img' => false,
 				'alt' => '',
-				'id' => ''
+				'id' => '',
+			    'confirm' => false,
+			    
 			), 
 			$options
 		);
-		if((isset($options['redirect']) && $options['redirect']) || $options['custom']){
-			$options['redirect'] = Router::url($options['redirect']);
-			$onclick = "logout('".$options['redirect']."');";
-			if(isset($options['confirm'])){
-				$onclick = 'if(confirm("'.$options['confirm'].'")){'.$onclick.'}';
+
+
+		extract(
+    		Utils::array_remove_keys($options,
+        		array(
+        		    'label', 'custom', 'redirect', 'img', 'alt', 'id', 'confirm',
+        		)
+    		)
+		);
+		
+		if ($redirect || $custom) {
+			$redirect = Router::url($redirect);
+			$onclick = "logout('{$redirect}');";
+			if ($confirm) {
+				$onclick = "if (confirm('{$confirm}')) { {$onclick} }";
 			}
-			if($options['img']){
-				$source = '/Facebook/img/'.$options['img'];
-				return $this->Html->image($source, array(
-				'alt' => $options['alt'],
-				'id' => $options['id'],
-				'url' => '#',
-				'onclick' => $onclick));
+			if ($img) {
+			    $url = '#';
+				return $this->Html->image("/Facebook/img/{$img}", compact('alt', 'id', 'url', 'onclick'));
 			}
 			else {
-				return $this->Html->link($options['label'], '#', array(
-					'onclick' => $onclick, 'id' => $options['id']));
+				return $this->Html->link($label, $redirect, $options + compact('onclick', 'id'));
 			}
 		} else {
-			$source = '/Facebook/img/facebook-logout.png';
-			return $this->Html->image($source, array(
-				'alt' => 'Facebook logout',
-				'url' => '#',
-				'id' => $options['id'],
-				'onclick' => 'logout();'));
+			return $this->Html->image('/Facebook/img/facebook-logout.png', 
+			    compact('id', 'alt') + array('onclick' => 'logout();')
+		    ); 
 		}
 	}
 	
