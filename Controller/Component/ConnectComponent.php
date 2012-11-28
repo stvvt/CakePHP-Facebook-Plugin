@@ -71,6 +71,13 @@ class ConnectComponent extends Component {
 	);
 	
 	/**
+	 * Components
+	 * 
+	 * @var array
+	 */
+	public $components = array('Session');
+	
+	/**
 	* Initialize, load the api, decide if we're logged in
 	* Sync the connected Facebook user with your application
 	* @param controller object to attach to
@@ -192,13 +199,13 @@ class ConnectComponent extends Component {
 	*/
 	public function user($field = null){
 		if(isset($this->uid)){
-			if($this->Controller->Session->read('FB.Me') == null){
-				$this->Controller->Session->write('FB.Me', $this->FB->api('/me'));
+			if($this->Session->read('FB.Me') == null){
+				$this->Session->write('FB.Me', $this->FB->api('/me'));
 			}
-			$this->me = $this->Controller->Session->read('FB.Me');
+			$this->me = $this->Session->read('FB.Me');
 		} 
 		else {
-			$this->Controller->Session->delete('FB');
+			$this->Session->delete('FB');
 		}
 		
 		if(!$this->me){
