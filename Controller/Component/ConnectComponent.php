@@ -265,3 +265,4 @@ class ConnectComponent extends Component {
 		$this->errors[] = __($msg, true);
 	}
 }
+
