@@ -144,7 +144,7 @@ class FacebookHelper extends AppHelper {
 		
 		if ($redirect || $custom) {
 			$redirect = Router::url($redirect);
-			$onclick = "login('{$redirect}');";
+			$onclick = "login('{$redirect}'); return false;";
 			if ($img) {
 				$source = "/Facebook/img/{$img}";
 				$url    = $redirect;
@@ -206,12 +206,12 @@ class FacebookHelper extends AppHelper {
 		
 		if ($redirect || $custom) {
 			$redirect = Router::url($redirect);
-			$onclick = "logout('{$redirect}');";
+			$onclick = "logout('{$redirect}'); return false;";
 			if ($confirm) {
-				$onclick = "if (confirm('{$confirm}')) { {$onclick} }";
+				$onclick = "if (confirm('{$confirm}')) { {$onclick} } return false;";
 			}
 			if ($img) {
-			    $url = '#';
+			    $url = $redirect;
 				return $this->Html->image("/Facebook/img/{$img}", compact('alt', 'id', 'url', 'onclick'));
 			}
 			else {
